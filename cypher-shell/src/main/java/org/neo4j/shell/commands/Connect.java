@@ -1,10 +1,11 @@
 package org.neo4j.shell.commands;
 
 import org.neo4j.shell.Command;
-import org.neo4j.shell.Shell;
+import org.neo4j.shell.Connector;
 import org.neo4j.shell.cli.CliArgHelper;
 import org.neo4j.shell.exception.CommandException;
 import org.neo4j.shell.exception.ExitException;
+import org.neo4j.shell.log.Logger;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -19,10 +20,12 @@ import static org.neo4j.shell.CommandHelper.simpleArgParse;
 public class Connect implements Command {
     private static final String COMMAND_NAME = ":connect";
 
-    private final Shell shell;
+    private final Logger logger;
+    private final Connector connector;
 
-    public Connect(@Nonnull final Shell shell) {
-        this.shell = shell;
+    public Connect(@Nonnull final Logger logger, @Nonnull final Connector connector) {
+        this.logger = logger;
+        this.connector = connector;
     }
 
     @Nonnull
@@ -87,7 +90,7 @@ public class Connect implements Command {
             }
         }
 
-        shell.connect(host, port, username, password);
-        shell.printOut("Connected to neo4j at @|bold " + host + ":" + port + "|@");
+        connector.connect(host, port, username, password);
+        logger.printOut("Connected to neo4j at @|bold " + host + ":" + port + "|@");
     }
 }

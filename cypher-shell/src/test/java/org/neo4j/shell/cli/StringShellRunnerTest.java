@@ -38,7 +38,7 @@ public class StringShellRunnerTest {
         String cypherString = "nonsense string";
         StringShellRunner runner = new StringShellRunner(shell, CliArgHelper.parse(cypherString));
 
-        runner.run();
+        runner.runUntilEnd();
         assertEquals(cypherString, shell.cypher());
     }
 
@@ -47,7 +47,7 @@ public class StringShellRunnerTest {
         StringShellRunner runner = new StringShellRunner(shell, CliArgHelper.parse(SimpleShell.ERROR));
 
         try {
-            runner.run();
+            runner.runUntilEnd();
         } catch (ClientException e) {
             assertEquals(SimpleShell.ERROR, e.getMessage());
         }

@@ -1,8 +1,7 @@
 package org.neo4j.shell.commands;
 
-import org.neo4j.driver.v1.Record;
 import org.neo4j.shell.Command;
-import org.neo4j.shell.CypherShell;
+import org.neo4j.shell.VariableHolder;
 import org.neo4j.shell.exception.CommandException;
 
 import javax.annotation.Nonnull;
@@ -18,10 +17,10 @@ public class Set implements Command {
     // Match arguments such as "(key) (value with possible spaces)" where key and value are any strings
     private static final Pattern argPattern = Pattern.compile("^\\s*(?<key>[^\\s]+)\\s+(?<value>.+)$");
     public static final String COMMAND_NAME = ":set";
-    private final CypherShell shell;
+    private final VariableHolder variableHolder;
 
-    public Set(@Nonnull final CypherShell shell) {
-        this.shell = shell;
+    public Set(@Nonnull final VariableHolder variableHolder) {
+        this.variableHolder = variableHolder;
     }
 
     @Nonnull
@@ -64,15 +63,9 @@ public class Set implements Command {
                             COMMAND_NAME, getUsage()));
         }
 
-        if (!shell.isConnected()) {
-            throw new CommandException("Not connected to Neo4j");
-        }
-
         String name = m.group("key");
         String valueString = m.group("value");
 
-        Record record = shell.doCypherSilently("RETURN " + valueString + " as " + name).single();
-        shell.getQueryParams().put(name, record.get(name).asObject());
+        variableHolder.set(name, valueString);
     }
-
 }
