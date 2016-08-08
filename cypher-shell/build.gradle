@@ -1,8 +1,5 @@
 apply plugin: 'java'
-apply plugin: 'application'
-
-mainClassName = 'org.neo4j.shell.Main'
-applicationName = 'cypher-shell'
+apply plugin: 'distribution'
 
 dependencies {
     compile "net.sourceforge.argparse4j:argparse4j:$argparse4jVersion"
