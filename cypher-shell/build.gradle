@@ -1,6 +1,19 @@
 apply plugin: 'java'
 apply plugin: 'distribution'
 
+distributions {
+  main {
+    baseName = 'cypher-shell'
+    contents {
+      from {'src/dist'}
+      into ('lib') {
+        from jar
+        from(project.configurations.runtime)
+      }
+    }
+  }
+}
+
 dependencies {
     compile "net.sourceforge.argparse4j:argparse4j:$argparse4jVersion"
     compile "org.neo4j.driver:neo4j-java-driver:$neo4jJavaVersion"
