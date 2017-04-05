@@ -1,0 +1,49 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+GRADLE_TASKS = installDist
+
+# Under fakeroot Gradle will show error while creating /root/.gradle, hence
+# specifying the Gradle home location.
+# Excluding :killExistingDaemons since it runs /bin/ps which is not installed in
+# a Buildd.
+GRADLE_FLAGS = --project-prop finalRelease=true  --stacktrace \
+               --gradle-user-home debian/.gradlehome --no-daemon # \
+	 		  #  -x :killExistingDaemons
+
+
+%:
+	#dh $@ --buildsystem=gradle
+	dh $@ --with maven_repo_helper,javahelper
+
+override_dh_auto_build:
+	gradle $(GRADLE_TASKS) $(GRADLE_FLAGS)
+
+override_dh_auto_clean:
+#	dh_auto_clean
+	gradle clean $(GRADLE_FLAGS)
+	rm -r -f gradle/wrapper/
+	rm -f gradlew
+	rm -f gradlew.bat
+#        find . -wholename .*build/generated-resources | xargs echo | sed -e 's^build/generated-resources^build^g' | xargs rm -Rf
+	rm -r -f .gradle debian/.gradlehome buildSrc/.gradle buildSrc/build build
+#        rm -r -f debian/gradle.1 subprojects/distributions/build
+#        $(RM) -r buildSrc/src/main/java
+
+
+# dh_make generated override targets
+# This is example for Cmake (See https://bugs.debian.org/641051 )
+#override_dh_auto_configure:
+#	dh_auto_configure -- #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)

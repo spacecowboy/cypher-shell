@@ -1,3 +1,11 @@
+.DEFAULT: all
+
+INSTALL ?= install
+INSTALL_PROGRAM ?= $(INSTALL)
+INSTALL_DATA ?= $(INSTALL) -m 644
+
+GRADLE ?= ./gradlew
+
 .PHONY: help build clean zip run untested-zip test integration-test tyrekicking-test mutation-test
 
 help: ## Print this help text
@@ -21,16 +29,16 @@ tyrekicking-test: tmp/.tests-pass ## Test that the shell script can actually sta
 mutation-test: cypher-shell/build/reports/pitest/index.html ## Generate a mutation testing report
 
 %/integrationTest/results.bin:
-	./gradlew integrationTest
+	$(GRADLE) integrationTest
 
 %/test/results.bin:
-	./gradlew check
+	$(GRADLE) check
 
 %/install/cypher-shell/cypher-shell:
-	./gradlew installDist
+	$(GRADLE) installDist
 
 %/reports/pitest/index.html:
-	./gradlew pitest
+	$(GRADLE) pitest
 
 tmp/.tests-pass: tmp/cypher-shell.zip tyrekicking.sh
 	cp tyrekicking.sh tmp/
@@ -53,9 +61,24 @@ out/cypher-shell.zip: tmp/cypher-shell.zip test integration-test tyrekicking-tes
 clean: ## Clean build directories
 	rm -rf out
 	rm -rf tmp
-	./gradlew clean
+	$(GRADLE) clean
 
 rmhosts: ## Remove known hosts file
 	rm -rf ~/.neo4j/known_hosts
 
 launch: rmhosts clean build run ## Removes known hosts file, cleans, builds, and runs the shell
+
+.PHONY: all
+#all: cypher-shell/build/install/cypher-shell/cypher-shell
+
+all:
+
+prefix ?= /usr/local
+BINDIR = $(DESTDIR)/$(prefix)/bin
+LIBDIR = $(DESTDIR)/$(prefix)/share/cypher-shell/lib
+.PHONY: install
+install: cypher-shell/build/install/cypher-shell/cypher-shell
+	mkdir -p $(BINDIR)
+	mkdir -p $(LIBDIR)
+	$(INSTALL_PROGRAM) cypher-shell/build/install/cypher-shell/cypher-shell $(BINDIR)
+	$(INSTALL_DATA) cypher-shell/build/install/cypher-shell/*.jar $(LIBDIR)
