@@ -19,6 +19,11 @@ jar {
   }
 }
 
+shadowJar {
+  // Make sure resulting jar does not contain version in name
+  version = null
+}
+
 distributions {
   main {
     baseName = 'cypher-shell'
