@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # See debhelper(7) (uncomment to enable)
 # output every command that modifies files on the build system.
-#export DH_VERBOSE = 1
+export DH_VERBOSE = 1
 
 
 # see FEATURE AREAS in dpkg-buildflags(1)
@@ -28,6 +28,9 @@ GRADLE_FLAGS = --project-prop finalRelease=true  --stacktrace \
 	#dh $@ --buildsystem=gradle
 	dh $@ --with maven_repo_helper,javahelper
 
+override_dh_auto_test:
+#dh_auto_test:
+
 override_dh_auto_build:
 	gradle $(GRADLE_TASKS) $(GRADLE_FLAGS)
 
@@ -41,7 +44,6 @@ override_dh_auto_clean:
 	rm -r -f .gradle debian/.gradlehome buildSrc/.gradle buildSrc/build build
 #        rm -r -f debian/gradle.1 subprojects/distributions/build
 #        $(RM) -r buildSrc/src/main/java
-
 
 # dh_make generated override targets
 # This is example for Cmake (See https://bugs.debian.org/641051 )
